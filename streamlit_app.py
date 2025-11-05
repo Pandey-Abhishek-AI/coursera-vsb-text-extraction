@@ -286,7 +286,10 @@ def main():
         if authenticator:
             authenticator.logout('Logout', 'sidebar', key='logout_button')
         st.divider()
-
+        
+        # Course ID
+        st.write(f"🆔 Course ID: `{st.session_state.course_id}`")
+        
         if st.button("🔄 Generate New Course ID"):
             st.session_state.course_id = f"course_{uuid.uuid4().hex[:8]}"
             # Clear previous data and uploaded file
@@ -435,4 +438,5 @@ def main():
         """)
 
 if __name__ == "__main__":
+
     main() 
