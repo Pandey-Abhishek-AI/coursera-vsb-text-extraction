@@ -391,7 +391,10 @@ def main():
         result = st.session_state.extracted_data
         c1, c2, c3 = st.columns(3)
         with c1:
-            st.metric("Lessons/Modules", result.get('total_lessons', result.get('total_modules', 0)))
+            if "Coursera 97" in course_type:
+                st.metric("Lessons", result.get('total_lessons', result.get('total_modules', 0)))
+            elif "Coursera 247" in course_type:
+                st.metric("Modules", result.get('total_lessons', result.get('total_modules', 0)))
         with c2:
             st.metric("Total Videos", result['total_videos'])
         with c3:
@@ -449,5 +452,6 @@ def main():
 if __name__ == "__main__":
 
     main() 
+
 
 
