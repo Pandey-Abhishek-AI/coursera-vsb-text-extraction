@@ -360,14 +360,25 @@ def main():
                         st.session_state.s3_files = result["s3_files"]
                         st.session_state.processing_status = "completed"
 
-                        st.markdown(f"""
-                        <div class="success-message">
-                            ✅ Extraction completed!<br>
-                            📊 Lessons/Modules: {result.get('total_lessons', result.get('total_modules', 0))}<br>
-                            🎥 Videos: {result['total_videos']}<br>
-                            📄 TXT Files: {len(result['s3_files'])}
-                        </div>
-                        """, unsafe_allow_html=True)
+                        if "Coursera 97" in course_type:
+                            st.markdown(f"""
+                            <div class="success-message">
+                                ✅ Extraction completed!<br>
+                                📊 Lessons: {result.get('total_lessons', result.get('total_modules', 0))}<br>
+                                🎥 Videos: {result['total_videos']}<br>
+                                📄 TXT Files: {len(result['s3_files'])}
+                            </div>
+                            """, unsafe_allow_html=True)
+                        elif "Coursera 247" in course_type:
+                            st.markdown(f"""
+                            <div class="success-message">
+                                ✅ Extraction completed!<br>
+                                📊 Modules: {result.get('total_lessons', result.get('total_modules', 0))}<br>
+                                🎥 Videos: {result['total_videos']}<br>
+                                📄 TXT Files: {len(result['s3_files'])}
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
                     else:
                         st.error(f"❌ {result['message']}")
                 except Exception as e:
@@ -440,3 +451,4 @@ def main():
 if __name__ == "__main__":
 
     main() 
+
