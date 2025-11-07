@@ -439,7 +439,7 @@ def main():
 
         **Excel Format Requirements:**
         - Column A: "Module 1", "Module 2", etc.
-        - Rows starting with "vignette video", "instructional video", "screencast", "video"
+        - Rows containing the words “video” or “screencast” (in any position) are automatically detected and included
         - Column B: Video titles
         - Column D: Voiceover scripts
 
@@ -452,6 +452,7 @@ def main():
 if __name__ == "__main__":
 
     main() 
+
 
 
 
