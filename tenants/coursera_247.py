@@ -63,7 +63,7 @@ def extract_video_data(module_df: pd.DataFrame) -> List[Tuple[str, str]]:
     """Extract video data (title and voiceover) from a module DataFrame."""
     try:
         video_data = []
-        # Look for rows contain "video" and also not contain screencast
+        # Filter entries that mention 'video' but exclude any that also mention 'screencast'
         video_mask = module_df[0].astype(str).str.strip().str.lower().str.contains("video", na=False) & ~module_df[0].astype(str).str.strip().str.lower().str.contains("screencast", na=False)
         video_rows = module_df[video_mask]
         
@@ -180,5 +180,6 @@ def process_module_outline(df: pd.DataFrame, course_id: str) -> Dict[str, Any]:
             "status": "error",
             "message": f"Processing failed: {str(e)}"
         }
+
 
 
