@@ -439,7 +439,7 @@ def main():
 
         **Excel Format Requirements:**
         - Column A: "Module 1", "Module 2", etc.
-        - # Rows containing “video” are detected and included, except those that also mention “screencast”
+        - Rows containing “video” are detected and included, except those that also mention “screencast”
         - Column B: Video titles
         - Column D: Voiceover scripts
 
@@ -452,6 +452,7 @@ def main():
 if __name__ == "__main__":
 
     main() 
+
 
 
 
