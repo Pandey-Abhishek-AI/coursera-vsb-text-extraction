@@ -331,7 +331,7 @@ def main():
 
     if uploaded_file is not None:
         st.info(f"📁 File uploaded: {uploaded_file.name} ({uploaded_file.size} bytes)")
-
+        course_code = uploaded_file.name.split('_')[0]
         # Sheet name input
         sheet_name = st.text_input("Sheet Name", value="Outline")
 
@@ -366,10 +366,10 @@ def main():
                     # ---------- Choose processor ----------
                     if "Coursera 97" in course_type:
                         from tenants.coursera_97 import process_course_outline
-                        result = process_course_outline(df, st.session_state.course_id)
+                        result = process_course_outline(df, st.session_state.course_id,course_code)
                     elif "Coursera 247" in course_type:
                         from tenants.coursera_247 import process_module_outline
-                        result = process_module_outline(df, st.session_state.course_id,st.session_state.include_screencast)
+                        result = process_module_outline(df, st.session_state.course_id,st.session_state.include_screencast,course_code)
 
                     # ---------- Display results ----------
                     if result["status"] == "success":
