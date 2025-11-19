@@ -296,6 +296,7 @@ def main():
             st.session_state.extracted_data = None
             st.session_state.s3_files = None
             st.session_state.processing_status = None
+            st.session_state.include_screencast = False
             st.rerun()
 
         st.divider()
@@ -313,6 +314,7 @@ def main():
                 st.session_state.extracted_data = None
                 st.session_state.s3_files = None
                 st.session_state.processing_status = None
+                st.session_state.include_screencast = False
 
         st.session_state.course_type = course_type  # persist selection
 
@@ -333,6 +335,21 @@ def main():
         # Sheet name input
         sheet_name = st.text_input("Sheet Name", value="Outline")
 
+        # Screencast filter (only for Coursera 247)
+        if "Coursera 247" in course_type:
+            # Default should always be "No"
+            include_screencast = st.radio(
+                "Include Screencast Videos?",
+                ["No", "Yes"],
+                index=0,   # 🔥 Ensures default = "No"
+                key=f"screencast_toggle_{st.session_state.course_id}",
+                horizontal=True
+            ) == "Yes"
+        else:
+            include_screencast = False
+
+        st.session_state.include_screencast = include_screencast
+
         if st.button("🚀 Extract Video Descriptions", type="primary"):
             if not S3_BUCKET_NAME:
                 logger.error("S3_BUCKET_NAME environment variable not set")
@@ -352,7 +369,7 @@ def main():
                         result = process_course_outline(df, st.session_state.course_id)
                     elif "Coursera 247" in course_type:
                         from tenants.coursera_247 import process_module_outline
-                        result = process_module_outline(df, st.session_state.course_id)
+                        result = process_module_outline(df, st.session_state.course_id,st.session_state.include_screencast)
 
                     # ---------- Display results ----------
                     if result["status"] == "success":
@@ -369,10 +386,11 @@ def main():
                             </div>
                             """, unsafe_allow_html=True)
                         elif "Coursera 247" in course_type:
+                            header = result.get("unit_type", "unit").capitalize()
                             st.markdown(f"""
                             <div class="success-message">
                                 ✅ Extraction completed!<br>
-                                📊 Modules: {result.get('total_lessons', result.get('total_modules', 0))}<br>
+                                📊 {header}s: {result.get('total_units', 0)}<br>
                                 🎥 Videos: {result['total_videos']}<br>
                                 📄 TXT Files: {len(result['s3_files'])}
                             </div>
@@ -394,7 +412,9 @@ def main():
             if "Coursera 97" in course_type:
                 st.metric("Lessons", result.get('total_lessons', result.get('total_modules', 0)))
             elif "Coursera 247" in course_type:
-                st.metric("Modules", result.get('total_lessons', result.get('total_modules', 0)))
+                unit_label = result.get("unit_type", "Unit").capitalize() + "s"
+                st.metric(unit_label, result.get('total_units', 0))
+
         with c2:
             st.metric("Total Videos", result['total_videos'])
         with c3:
@@ -402,7 +422,8 @@ def main():
 
         st.subheader("📄 Generated TXT Files")
         for f in result["s3_files"]:
-            label = f"Lesson {f.get('lesson')}" if "lesson" in f else f"Module {f.get('module')}"
+            unit_type = result.get("unit_type", "unit").capitalize()
+            label = f"{unit_type} {f.get('module')}"
             st.write(f"📝 **{label} - Video {f['video']}**: {f['title']} → [Download TXT]({f['s3_url']})")
 
         if st.checkbox("👀 Show Raw JSON Data"):
@@ -434,27 +455,25 @@ def main():
         st.markdown("""
         1. **Upload** your course outline Excel file (.xlsx format)
         2. **Specify** the sheet name (default: "Outline")
-        3. **Click** "Extract Video Descriptions" to process the file
-        4. **Download** individual TXT files from S3 links
+        3. **Choose** whether to include *screencast videos* (default: No)
+        4. **Click** "Extract Video Descriptions" to process the file
+        5. **Download** individual TXT files via S3 links
 
         **Excel Format Requirements:**
-        - Column A: "Module 1", "Module 2", etc.
-        - Rows containing “video” are detected and included, except those that also mention “screencast”
+        - Column A must contain either **"Module X"** or **"Lesson X"**  
+        (the system automatically detects which one is used first)
+        - Rows containing **"video"** are identified as video entries  
+        - Screencast videos are excluded unless you enable *Include Screencast*
         - Column B: Video titles
         - Column D: Voiceover scripts
 
         **Output Format:**
         - One TXT file per video (uploaded to S3)
-        - Clean video descriptions without metadata
-        - Ready for sharing and editing
+        - Automatically labeled using the detected type:  
+        **Module N - Video M** *or* **Lesson N - Video M**
+        - Cleaned video descriptions ready for sharing and editing
         """)
 
 if __name__ == "__main__":
 
     main() 
-
-
-
-
-
-
