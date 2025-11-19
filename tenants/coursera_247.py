@@ -121,7 +121,7 @@ def find_unit_count(df: pd.DataFrame, unit_type: str) -> int:
     pattern = fr"{unit_type}\s+\d+"
     return col.str.match(pattern, na=False).sum()
 
-def process_module_outline(df: pd.DataFrame, course_id: str, include_screencast: bool) -> Dict[str, Any]:
+def process_module_outline(df: pd.DataFrame, course_id: str, include_screencast: bool, course_code: str) -> Dict[str, Any]:
     """Process the course outline and extract all video data."""
     try:
         unit_type = detect_header_type(df)
@@ -166,9 +166,11 @@ def process_module_outline(df: pd.DataFrame, course_id: str, include_screencast:
                     txt_buffer = create_video_txt(unit_num, idx, title, voiceover, course_id)
                     # Clean filename by removing special characters
                     clean_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).rstrip()
-                    clean_title = clean_title.replace(' ', '_')[:50]  # Limit length and replace spaces
-                    s3_key = f"video_descriptions/{course_id}/{unit_type}_{unit_num}_video_{idx}_{clean_title}.txt"
-                    
+                    clean_title = clean_title.replace(' ', '_')  # Replace spaces
+                    if unit_type == "module":
+                        s3_key = f"video_descriptions/{course_id}/{course_code}_M{unit_num}V{idx}_{clean_title}.txt"
+                    elif unit_type == "lesson":
+                        s3_key = f"video_descriptions/{course_id}/{course_code}_L{unit_num}V{idx}_{clean_title}.txt"
                     if upload_to_s3(txt_buffer.getvalue(), s3_key):
                         s3_files.append({
                             "module": unit_num,
