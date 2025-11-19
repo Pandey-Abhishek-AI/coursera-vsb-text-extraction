@@ -100,7 +100,7 @@ def find_lesson_count(df: pd.DataFrame) -> int:
         st.error(f"Error counting lessons: {e}")
         return 0
 
-def process_course_outline(df: pd.DataFrame, course_id: str) -> Dict[str, Any]:
+def process_course_outline(df: pd.DataFrame, course_id: str, course_code: str) -> Dict[str, Any]:
     """Process the course outline and extract all video data."""
     try:
         logger.info(f"Starting course outline processing for course: {course_id}")
@@ -139,8 +139,8 @@ def process_course_outline(df: pd.DataFrame, course_id: str) -> Dict[str, Any]:
                     txt_buffer = create_video_txt(lesson_num, idx, title, voiceover, course_id)
                     # Clean filename by removing special characters
                     clean_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).rstrip()
-                    clean_title = clean_title.replace(' ', '_')[:50]  # Limit length and replace spaces
-                    s3_key = f"video_descriptions/{course_id}/lesson_{lesson_num}_video_{idx}_{clean_title}.txt"
+                    clean_title = clean_title.replace(' ', '_')  # Replace spaces
+                    s3_key = f"video_descriptions/{course_id}/{course_code}_L{lesson_num}V{idx}_{clean_title}.txt"
                     
                     if upload_to_s3(txt_buffer.getvalue(), s3_key):
                         s3_files.append({
