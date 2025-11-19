@@ -331,7 +331,7 @@ def main():
 
     if uploaded_file is not None:
         st.info(f"📁 File uploaded: {uploaded_file.name} ({uploaded_file.size} bytes)")
-        course_code = uploaded_file.name.split('_')[0]
+        course_code = uploaded_file.name.rsplit('.', 1)[0].split('_')[0]
         # Sheet name input
         sheet_name = st.text_input("Sheet Name", value="Outline")
 
@@ -477,3 +477,4 @@ def main():
 if __name__ == "__main__":
 
     main() 
+
