@@ -168,9 +168,9 @@ def process_module_outline(df: pd.DataFrame, course_id: str, include_screencast:
                     clean_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).rstrip()
                     clean_title = clean_title.replace(' ', '_')  # Replace spaces
                     if unit_type == "module":
-                        s3_key = f"video_descriptions/{course_id}/{course_code}_M{unit_num}V{idx}_{clean_title}.txt"
+                        s3_key = f"video_descriptions/{course_id}/{course_code}_M{unit_num}_V{idx}_{clean_title}.txt"
                     elif unit_type == "lesson":
-                        s3_key = f"video_descriptions/{course_id}/{course_code}_L{unit_num}V{idx}_{clean_title}.txt"
+                        s3_key = f"video_descriptions/{course_id}/{course_code}_L{unit_num}_V{idx}_{clean_title}.txt"
                     if upload_to_s3(txt_buffer.getvalue(), s3_key):
                         s3_files.append({
                             "module": unit_num,
@@ -211,3 +211,4 @@ def process_module_outline(df: pd.DataFrame, course_id: str, include_screencast:
             "status": "error",
             "message": f"Processing failed: {str(e)}"
         }
+
