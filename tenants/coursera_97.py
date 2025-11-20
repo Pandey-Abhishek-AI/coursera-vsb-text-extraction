@@ -140,7 +140,7 @@ def process_course_outline(df: pd.DataFrame, course_id: str, course_code: str) -
                     # Clean filename by removing special characters
                     clean_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).rstrip()
                     clean_title = clean_title.replace(' ', '_')  # Replace spaces
-                    s3_key = f"video_descriptions/{course_id}/{course_code}_L{lesson_num}V{idx}_{clean_title}.txt"
+                    s3_key = f"video_descriptions/{course_id}/{course_code}_L{lesson_num}_V{idx}_{clean_title}.txt"
                     
                     if upload_to_s3(txt_buffer.getvalue(), s3_key):
                         s3_files.append({
@@ -180,3 +180,4 @@ def process_course_outline(df: pd.DataFrame, course_id: str, course_code: str) -
             "status": "error",
             "message": f"Processing failed: {str(e)}"
         }
+
